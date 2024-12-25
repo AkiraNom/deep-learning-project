@@ -1,0 +1,8 @@
+.Trash-0
+.ipynb_checkpoints
+__pycache__
+CNN/model.zip
+CNN/data.zip
+CNN/data/
+CNN/model/
+

@@ -1,0 +1,17 @@
+torch
+torchvision
+scipy
+numpy
+pandas
+matplotlib
+seaborn
+jupyterlab
+scikit-learn
+thop
+albumentations
+opencv-python
+imgaug
+torchtext
+nltk
+gensim
+portalocker

@@ -1,0 +1,15 @@
+version: '3.10'
+services:
+  basic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ds-python
+    container_name: ds-python
+    ports:
+      - "8888:8888"
+    volumes:
+      - type: bind
+        source: C:/Users/carve/Desktop/python/docker_project/Deep-learning-project
+        target: /scripts
+    restart: on-failure
