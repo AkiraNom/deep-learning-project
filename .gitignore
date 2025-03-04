@@ -1,8 +1,8 @@
 .Trash-0
 .ipynb_checkpoints
 __pycache__
-CNN/model.zip
-CNN/data.zip
-CNN/data/
-CNN/model/
+CNN-Transfer-Learning/model.zip
+CNN-Transfer-Learning/data.zip
+CNN-Transfer-Learning/data/
+CNN-Transfer-Learning/model/
 

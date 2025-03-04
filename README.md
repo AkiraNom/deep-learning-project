@@ -1,6 +1,6 @@
 # Deep Learning Project
 
-## 1. CNN - CIFAR10 Image Classification task
+## 1. CNN - CIFAR10 Image Classification Using Transfer Learning
 
 The VGG11+ batch normalization model with the pre-trained parameters in the torchvision is used for CIFAR10 image classification task.
 
