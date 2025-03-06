@@ -15,3 +15,5 @@ torchtext
 nltk
 gensim
 portalocker
+streamlit
+plotly

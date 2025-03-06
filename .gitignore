@@ -1,8 +1,9 @@
 .Trash-0
 .ipynb_checkpoints
 __pycache__
-CNN-Transfer-Learning/model.zip
-CNN-Transfer-Learning/data.zip
-CNN-Transfer-Learning/data/
-CNN-Transfer-Learning/model/
+CNN-Transfer-Learning/CIFAR10_image_classification/model.zip
+CNN-Transfer-Learning/CIFAR10_image_classification/data.zip
+CNN-Transfer-Learning/CIFAR10_image_classification/data/
+CNN-Transfer-Learning/CIFAR10_image_classification/model/
 
+CNN-Transfer-Learning/Flower_image_classification/data/
