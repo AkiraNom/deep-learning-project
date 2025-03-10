@@ -61,8 +61,9 @@ st.subheader(":gray[Test the Classifer Model]", divider=True)
 
 st.write("")
 
-
-model = load_pretrained_model(params_path='./model/flower_classifier_model.pth')
+# model_params_path = './model/flower_classifier_model.pth' # for local deployment
+model_params_path = './deep-learning-project/CNN-Transfer-Learning/Flower_image_classification/model/flower_classifier_model.pth'
+model = load_pretrained_model(params_path=model_params_path)
 
 ## Select a flower image
 image_source = None
@@ -77,7 +78,8 @@ st.warning("The latest version of streamlit may have an issue with uploading an 
 st.write("")
 on = st.toggle("Select from the test images")
 if on:
-    path = glob('./img/test/*.jpg')
+    # path = glob('./img/test/*.jpg') # for local deployment
+    path = glob('./deep-learning-project/CNN-Transfer-Learning/Flower_image_classification//img/test/*.jpg')
     # Extract file names from paths
     file_names = [os.path.basename(p) for p in path]
     selected_file = st.selectbox("Choose an image", file_names)
