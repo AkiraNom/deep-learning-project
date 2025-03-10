@@ -41,7 +41,7 @@ with intro1:
                         <li> <b>Email</b>: XXXXXXXX@gmail.com <br>
                     </ul>
                 """, unsafe_allow_html=True)
-        st.write("""**Additional Note**: codes for fine-tuning and validating the model can be found in the [notebook]().""")
+        st.write("""**Additional Note**: codes for fine-tuning and validating the model can be found in the [notebook](https://github.com/AkiraNom/deep-learning-project/blob/main/CNN-Transfer-Learning/Flower_image_classification/flower_image_classification_using_transfer_learning.ipynb).""")
 
     with st.expander("**Model Stats**"):
         st.write("1. **Training Epochs**: 200")
