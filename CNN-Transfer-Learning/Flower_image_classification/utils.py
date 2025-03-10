@@ -50,7 +50,12 @@ class ImageProcessing:
 
         return fig
 
-def load_category_names(file_path='./img/cat_to_name.json'):
+# path for local deployment
+# file_path = './img/cat_to_name.json'
+
+# path for deployment on the streamlit cloud
+file_path = './deep-learning-project/CNN-Transfer-Learning/Flower_image_classification/img/cat_to_name.json'
+def load_category_names(file_path=file_path):
     """
     Load the category names from the json file
     """
