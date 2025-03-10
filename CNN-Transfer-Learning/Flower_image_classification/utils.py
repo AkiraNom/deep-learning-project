@@ -1,7 +1,10 @@
 
-from PIL import Image
 import json
+import os
+from PIL import Image
+
 import plotly.express as px
+
 import torch
 from torchvision import transforms
 
@@ -51,10 +54,11 @@ class ImageProcessing:
         return fig
 
 # path for local deployment
-# file_path = './img/cat_to_name.json'
+file_path = 'img/cat_to_name.json'
 
 # path for deployment on the streamlit cloud
-file_path = './deep-learning-project/CNN-Transfer-Learning/Flower_image_classification/img/cat_to_name.json'
+parent_dir = './CNN-Transfer-Learning/Flower_image_classification'
+file_path = os.path.join(parent_dir, file_path) # for deployment on the streamlit cloud
 def load_category_names(file_path=file_path):
     """
     Load the category names from the json file
