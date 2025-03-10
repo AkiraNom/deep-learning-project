@@ -8,8 +8,6 @@ from torchvision.models.mobilenetv3 import MobileNet_V3_Small_Weights
 
 import matplotlib.pyplot as plt
 
-
-
 def load_pretrained_model(base_model=mobilenet_v3_small, weights=MobileNet_V3_Small_Weights, num_classes=102, params_path=None):
     """
     Load a pre-trained model and change the classifier to the number of classes in the dataset.
@@ -29,9 +27,18 @@ def load_pretrained_model(base_model=mobilenet_v3_small, weights=MobileNet_V3_Sm
     return model
 
 
-def predict_class(image, model, device='cpu'):
+def predict_class(model, image, device='cpu'):
     """
+    Predict the class of the flower image
+
+    return the probabilities of the classes
     """
 
-    pass
+    model.eval()
 
+    with torch.no_grad():
+        image = image.to(device)
+        preds = model(image)
+        probs = torch.nn.functional.softmax(preds, dim=1)
+
+    return probs
