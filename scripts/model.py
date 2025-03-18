@@ -31,11 +31,23 @@ class LSTM(nn.Module):
         return nn.Sigmoid()(out)
 
     @staticmethod
-    def load_model(PATH):
+    def load_model(PATH, vocab ,full_model=True):
         """
         Load a pre-trained model and change the classifier to the number of classes in the dataset.
         """
-        model = torch.load(PATH, weights_only=False, map_location=torch.device('cpu'))
+        if full_model:
+            model = torch.load(PATH, weights_only=False, map_location=torch.device('cpu'))
+
+        else:
+            #model parameters
+            num_classes = 1 # binary classes: 0 for negative, 1 for positive
+            embedding_dim = 300
+            hidden_size = 64
+            output_size = num_classes
+            num_layers = 2
+
+            model = LSTM(len(vocab), embedding_dim, hidden_size, output_size, embedding_matrix=None, num_layers=num_layers, bidirectional=True)
+            model.load_state_dict(torch.load(PATH, map_location=torch.device('cpu')))
 
         return model
 
