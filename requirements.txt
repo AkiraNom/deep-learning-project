@@ -1,13 +1,9 @@
-scipy
 numpy
 pandas
 matplotlib
 seaborn
 jupyterlab
 scikit-learn
-albumentations
-opencv-python
-imgaug
 torch==2.1.0
 torchvision
 torchtext==0.16.0
