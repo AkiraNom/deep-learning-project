@@ -49,9 +49,11 @@ st.subheader(":gray[Sentiment predictions]", divider=True)
 
 st.write("")
 
-
-model = LSTM.load_model('../model/model.pth')
 vocab = Processing.load_vocab_library('../model/vocab.pth')
+full_model_path = '../model/model.pth'
+model_state_dict_path = '../model/model_state_dict.pth'
+model = LSTM.load_model(model_state_dict_path,vocab, full_model=False)
+
 tokenizer = Processing.set_tokenizer()
 
 cols = st.columns([1,1])
@@ -81,7 +83,7 @@ with st.container():
 
         placeholder_txt = 'Enter a comment'
         txt = st.text_area('Text to analyze',
-                        value=st.session_state.txt if st.session_state.txt == default_txt else None,
+                        value=st.session_state.txt,
                         placeholder=placeholder_txt,
                         on_change=analyze_text,
                         height=100,
@@ -89,10 +91,15 @@ with st.container():
                         key='txt',
                         )
 
-        st.write(f'{len(txt)} characters, Max 400 characters')
-
+        button_cols = st.columns([0.1,1,1,0.1])
+        # Analysis button
+        button_cols[1].button('Analyze', on_click=analyze_text)
         # Clear text button
-        st.button('Clear Text', on_click=reset_text)
+        button_cols[2].button('Clear Text', on_click=reset_text)
+
+        if txt == None:
+            st.warning('Please type a comment')
+            st.stop()
 
 with cols[1]:
     st.write('**Result**')
