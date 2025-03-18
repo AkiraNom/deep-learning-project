@@ -2,3 +2,4 @@ __pycache__
 docker-compose.yml
 Dockerfile
 /rsc/GoogleNews-vectors-negative300.bin.gz
+/model/*

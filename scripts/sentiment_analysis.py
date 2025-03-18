@@ -50,9 +50,15 @@ st.subheader(":gray[Sentiment predictions]", divider=True)
 st.write("")
 
 vocab = Processing.load_vocab_library('../model/vocab.pth')
-full_model_path = '../model/model.pth'
-model_state_dict_path = '../model/model_state_dict.pth'
-model = LSTM.load_model(model_state_dict_path,vocab, full_model=False)
+
+full_model = False
+if full_model == False:
+    # path for model_state_dict
+    model_path = '../model/model_state_dict.pth'
+else:
+    # path for the full model
+    model_path = '../model/model.pth'
+model = LSTM.load_model(model_path,vocab, full_model=full_model)
 
 tokenizer = Processing.set_tokenizer()
 
