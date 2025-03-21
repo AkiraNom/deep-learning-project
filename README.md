@@ -32,3 +32,5 @@ The LSTM model is used to predict a forex future price movement.
 * Optimizer: Adam
 * Learning Rate: Adjusted dynamically using CosineAnnealingLR
 * Loss Function: Binary Crossentropy
+
+![](LSTM_model/sentiment-analysis/rsc/img/sentiment-analysis.gif)
