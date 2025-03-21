@@ -19,3 +19,16 @@ The LSTM model is used to predict a forex future price movement.
 
  * One feature input : EURUSD daily close price
  * Two feature inputs : EURUSD and SP500 daily close price
+
+ ## 4. RNN - LSTM Sentiment Analysis
+
+ This project implements a Sentiment Analysis model using Long Short Term Memory (LSTM) networks and Word2Vec embeddings. It is desinged for classifying texutal data, such as customer reviews, into binary sentiment classes (e.g. Positive or Negative). Additionally, the model is integrated with Streamlit, enabling users to interactively classify input text
+
+### Model Characteristics
+* Model Architecture: LSTM
+* Framework: PyTorch
+* Training Data: Amazon Review Polarity Dataset
+* Number of Classes: 2 (Positive, Negative)
+* Optimizer: Adam
+* Learning Rate: Adjusted dynamically using CosineAnnealingLR
+* Loss Function: Binary Crossentropy
