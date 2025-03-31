@@ -1,0 +1,53 @@
+{
+    "model_summary": {
+        "ticker": "EURUSD",
+        "ticker_symbol": "EURUSD=X",
+        "input_shape": [
+            30,
+            20
+        ],
+        "hyperparameters": {
+            "dropout_rate": 0.2,
+            "learning_rate": 0.0005,
+            "batch_size": 32,
+            "hidden_size_1": 128,
+            "hidden_size_2": 64,
+            "hidden_size_3": 32
+        },
+        "training_samples": 3136,
+        "test_samples": 785
+    },
+    "evaluation_metrics": {
+        "mse": 0.012097063626216096,
+        "mae": 0.10605591618141551,
+        "rmse": 0.10998665203658167,
+        "direction_accuracy": 0.5178571428571429,
+        "r2": -2.256746292114258
+    },
+    "training_period": {
+        "start_date": "2010-01-01",
+        "end_date": "2025-03-31"
+    },
+    "features_used": [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "MA5",
+        "MA10",
+        "MA20",
+        "BB_upper",
+        "BB_middle",
+        "BB_lower",
+        "RSI",
+        "MACD",
+        "MACD_signal",
+        "MACD_hist",
+        "Price_Change",
+        "Price_Change_5d",
+        "HL_Diff",
+        "HL_Diff_Pct",
+        "ATR"
+    ]
+}
