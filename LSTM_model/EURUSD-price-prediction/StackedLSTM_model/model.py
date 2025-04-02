@@ -595,6 +595,9 @@ class PredictionModel:
         plt.close()
 
     def _residual_analysis(self):
+        """
+        Perform residual analysis on the model predictions
+        """
 
         if self.model is None:
             print("Model not available. Please run build_model and train_model first.")
