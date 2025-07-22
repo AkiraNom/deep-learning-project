@@ -30,9 +30,7 @@ def main():
         'dropout_rate': 0.2,
         'learning_rate': 0.0005,
         'batch_size': 32,
-        'hidden_size_1': 128,
-        'hidden_size_2': 64,
-        'hidden_size_3': 32
+        'hidden_sizes': (128, 64, 32)  # Tuple for multiple hidden sizes
     }
 
     # name and ticker
@@ -40,7 +38,7 @@ def main():
 
     # date range
     start_date = '2010-01-01'
-    end_date = None
+    end_date = '2025-03-31'
 
     # Fetch and preprocess data
     data_handler = FinancialDataHandler(

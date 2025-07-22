@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import os
+from typing import Optional, Tuple
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,95 +32,141 @@ class TimeSeriesDataset(Dataset):
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
 
+def sequence_mask(lengths: torch.Tensor, max_len: Optional[int] = None) -> torch.Tensor:
+    if max_len is None:
+        max_len = int(lengths.max().item())
 
-class AttentionLayer(nn.Module):
+    range_ = torch.arange(0, max_len, device=lengths.device)[None, :]
+    return range_ < lengths[:, None]
+
+
+class AdditiveAttention(nn.Module):
     """
-    Attention mechanism for LSTM
+    Single-query additive attetnion mechanism (Bahdanau-sytle attention)
+
+    This module socres each time step independently using:
+    .. math::
+        score_T = \\tanh(W * h_t + b)
+
+    where
+        :math:`W` is a learnable weight matrix
+        :math:`b` is a learnable bias vector.
+
+    Then applies a softmax over time steps to produce normalized attentions weights
+    and a weigted sum context vector
     """
-    def __init__(self, hidden_size):
+    def __init__(self, hidden_size: int, attn_hidden: Optional[int] =None):
         super().__init__()
-        self.hidden_size = hidden_size
-        self.attention = nn.Linear(hidden_size, 1)
+        attn_hidden = attn_hidden or hidden_size
+        self.score = nn.Sequential(
+            nn.Linear(hidden_size, attn_hidden),
+            nn.Tanh(),
+            nn.Linear(attn_hidden, 1, bias=False)
+        )
 
-    def forward(self, lstm_output):
-        # lstm_output shape: (batch_size, seq_len, hidden_size)
-        attention_weights = torch.softmax(self.attention(lstm_output), dim=1)
+    def forward(self, h: torch.Tensor, mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        # h shape: (batch_size, seq_len, hidden_size)
+        scores = self.score(h)
+        if mask is not None:
+            mask_ = mask.unsqueeze(-1)  # Expand mask to match scores shape
+            scores = scores.masked_fill(~mask_, float('-inf'))
+
         # attention_weights shape: (batch_size, seq_len, 1)
+        attn_weights = torch.softmax(scores, dim=1)
 
-        context_vector = torch.sum(attention_weights * lstm_output, dim=1)
         # context_vector shape: (batch_size, hidden_size)
+        context_vector = torch.sum(attn_weights * h, dim=1)
 
-        return context_vector, attention_weights
+        return context_vector, attn_weights
 
 
-class StackedLSTMModel(nn.Module):
+class StackedLSTMWithAttention(nn.Module):
     """
     Stacked LSTM model with attention mechanism
     """
-    def __init__(self, input_size, hidden_size_1=128, hidden_size_2=64, hidden_size_3=32,
-                 dropout_rate=0.2, output_size=1):
+    def __init__(
+        self,
+        input_size: int,
+        hidden_sizes: Tuple[int, int, int] = (128, 64, 32),
+        dropout_rate: float = 0.2,
+        output_size: int = 1,
+        attn_hidden: Optional[int] = None,
+        bidirectional: bool = False,
+        fuse_last: bool = True
+        ):
 
         super().__init__()
+        if isinstance(hidden_sizes, int):
+            hidden_sizes = (hidden_sizes,)
 
-        self.hidden_size_1 = hidden_size_1
-        self.hidden_size_2 = hidden_size_2
-        self.hidden_size_3 = hidden_size_3
+        self.hidden_sizes = list(hidden_sizes)
+        self.num_layers = len(self.hidden_sizes)
         self.dropout_rate = dropout_rate
+        self.bidirectional = bidirectional
+        self.lstm_layers = nn.ModuleList()
+        self.dropout_layers = nn.ModuleList()
+        self.fuse_last = fuse_last
+        in_dim = input_size
 
-        # First LSTM layer
-        self.lstm1 = nn.LSTM(input_size, hidden_size_1, batch_first=True)
-        self.dropout1 = nn.Dropout(dropout_rate)
+        # LSTM layers
+        for i, h in enumerate(self.hidden_sizes):
+            self.lstm_layers.append(nn.LSTM(
+                input_size=in_dim,
+                hidden_size=h,
+                batch_first=True,
+                bidirectional=self.bidirectional
+                ))
 
-        # Second LSTM layer
-        self.lstm2 = nn.LSTM(hidden_size_1, hidden_size_2, batch_first=True)
-        self.dropout2 = nn.Dropout(dropout_rate)
+            if i < len(self.hidden_sizes) - 1:
+                self.dropout_layers.append(nn.Dropout(self.dropout_rate))
+            in_dim = h * (2 if self.bidirectional else 1)
 
-        # Attention mechanism
-        self.attention = AttentionLayer(hidden_size_2)
-
-        # Third LSTM layer
-        self.lstm3 = nn.LSTM(hidden_size_2 * 2, hidden_size_3, batch_first=True)
-        self.dropout3 = nn.Dropout(dropout_rate)
-
-        # Output layer
-        self.fc = nn.Linear(hidden_size_3, output_size)
-
-    def forward(self, x, apply_dropout=False):
-        # x shape: (batch_size, seq_len, input_size)
-
-        # First LSTM layer
-        lstm1_out, _ = self.lstm1(x)
-        if apply_dropout:
-            lstm1_out = self.dropout1(lstm1_out)
-        else:
-            lstm1_out = lstm1_out * (1 - self.dropout_rate)
-
-        # Second LSTM layer
-        lstm2_out, _ = self.lstm2(lstm1_out)
-        if apply_dropout:
-            lstm2_out = self.dropout2(lstm2_out)
-        else:
-            lstm2_out = lstm2_out * (1 - self.dropout_rate)
+        final_hidden = self.hidden_sizes[-1] * (2 if self.bidirectional else 1)
+        attn_hidden = attn_hidden or final_hidden
 
         # Attention mechanism
-        context_vector, attention_weights = self.attention(lstm2_out)
-        context_vector_expanded = context_vector.unsqueeze(1).expand(-1, lstm2_out.size(1), -1)
-        combined = torch.cat((lstm2_out, context_vector_expanded), dim=2)
+        self.attention = AdditiveAttention(
+            hidden_size=final_hidden,
+            attn_hidden=attn_hidden,
+        )
 
-        # Third LSTM layer
-        lstm3_out, _ = self.lstm3(combined)
-        if apply_dropout:
-            lstm3_out = self.dropout3(lstm3_out)
+        if self.fuse_last:
+            fc_in = final_hidden *2 # context vector + last hidden state
         else:
-            lstm3_out = lstm3_out * (1 - self.dropout_rate)
-
-        # ooutput at last time step
-        last_time_step = lstm3_out[:, -1, :]
+            fc_in = final_hidden # context vector only
 
         # Output layer
-        output = self.fc(last_time_step)
+        self.fc = nn.Linear(fc_in, output_size)
 
-        return output, attention_weights
+    def forward(
+        self,
+        h: torch.Tensor , # (batch_size, seq_len, input_size)
+        lengths: Optional[torch.Tensor] = None, # (batch_size,)
+        return_attn: bool = True):
+
+        # LSTM layer
+        for i, lstm in enumerate(self.lstm_layers):
+            h, _ = lstm(h)
+
+            if i < len(self.dropout_layers):
+                h = self.dropout_layers[i](h)
+
+        mask = sequence_mask(lengths=h.size(1), max_len=h.size(1)) if lengths is not None else None
+
+        # Attention layer
+        context_vector, attn_weights = self.attention(h, mask=mask)
+
+        if self.fuse_last:
+            last_indices = (lengths -1) if lengths is not None else torch.tensor([h.size(1) - 1] * h.size(0))
+            last_h = h[torch.arange(h.size(0)), last_indices]
+            rep = torch.cat([context_vector, last_h], dim=-1)
+        else:
+            rep = context_vector
+
+        # Output layer
+        out = self.fc(rep)
+
+        return (out, attn_weights) if return_attn else out
 
 
 class PredictionModel:
@@ -164,9 +211,8 @@ class PredictionModel:
             'dropout_rate': 0.2,
             'learning_rate': 0.0005,
             'batch_size': 32,
-            'hidden_size_1': 128,
-            'hidden_size_2': 64,
-            'hidden_size_3': 32
+            'hidden_sizes': (128, 64, 32)
+
         }
 
         # Update params with opitmized params if provided
@@ -192,11 +238,9 @@ class PredictionModel:
         print(f"Building stacked LSTM model with input size {input_size}")
 
         # Create model
-        model = StackedLSTMModel(
+        model = StackedLSTMWithAttention(
             input_size=input_size,
-            hidden_size_1=self.params['hidden_size_1'],
-            hidden_size_2=self.params['hidden_size_2'],
-            hidden_size_3=self.params['hidden_size_3'],
+            hidden_sizes=self.params['hidden_sizes'],
             dropout_rate=self.params['dropout_rate']
         ).to(self.device)
 
@@ -282,7 +326,7 @@ class PredictionModel:
 
                 optimizer.zero_grad()
 
-                outputs, _ = self.model(batch_X, apply_dropout=True)
+                outputs, _ = self.model(batch_X)
 
                 loss = criterion(outputs, batch_y)
 
@@ -496,7 +540,7 @@ class PredictionModel:
 
         with torch.no_grad():
             for i in range(n_samples):
-                outputs, _ = self.model(X_test_tensor, apply_dropout=True)
+                outputs, _ = self.model(X_test_tensor)
                 predictions.append(outputs.cpu().numpy())
 
                 if (i+1) % 10 == 0:

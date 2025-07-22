@@ -18,4 +18,4 @@ portalocker
 datasets
 streamlit
 plotly
-
+Pillow
