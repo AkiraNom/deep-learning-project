@@ -11,7 +11,7 @@ The VGG11+ batch normalization model with the pre-trained parameters in the torc
 
  Flower Image Classifier is a machine learning model designed to predict the class of flower images.The pretrained MobileNetV3 model, along with its weights has been fine-tuned with data augmentation specifically for flower image classification. Impbalance data handling techniques have been implemented to improve the model's performance. The model has been trained on the Oxford 102 Flower Dataset. <br>
 
- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](oxford-flower-image-classifier.streamlit.app)
+ [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://oxford-flower-image-classifier.streamlit.app/)
 
 ## 3.1 RNN - EUR/USD Price Prediction (Time-Series Forecasting)
 
