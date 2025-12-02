@@ -5,14 +5,14 @@
 This project applies transfer learning with a pre-trained VGG11 + batch normalization model to classify images in the CIFAR-10 dataset. It includes data augmentation for better generalization, along with early stopping and model checkpointing to optimize training and save the best model.
 
 * **Model Architecture**: [VGG11 + batch normalization](https://docs.pytorch.org/vision/main/models/generated/torchvision.models.vgg11_bn.html#torchvision.models.vgg11_bn)
-* **Data Source**: [CIFAR10-torchvision](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.CIFAR10.html) 
+* **Data Source**: [CIFAR10-torchvision](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.CIFAR10.html)
 * **Key Features**: Data augmentation
 * **Performance Metrics**: validation loss: 0.35754, validation accuracy: 89.42%
-  
+
 ## 2. CNN - Oxford Flower Image Classifier Using Transfer Learning.
 
  Flower Image Classifier is a machine learning model designed to predict the class of flower images.The pretrained MobileNetV3 model, along with its weights has been fine-tuned with data augmentation specifically for flower image classification. Impbalance data handling techniques have been implemented to improve the model's performance.<br>
- 
+
 * **Model Architecture**: [MobileNetV3-Pytorch](https://pytorch.org/vision/main/models/mobilenetv3.html)
 * **Data Source**:  [Oxford 102 Flower Dataset](https://www.robots.ox.ac.uk/~vgg/data/flowers/102/)
 * **Features**: * Data augmentation, imbalance class handling
@@ -30,6 +30,12 @@ Built an single layer LSTM-based model to predict EUR/USD price trends, utilizin
 
 ## 3.2 RNN - Forex Price Prediction (Time-Series Forecasting)
 
+> ⚠️ **Performance Bias Notice 12/2/2025**:<br>
+> The current stacked LSTM model for EURUSD forecasting is implemented as a **binary classification (up/down)** task.
+> This design introduces a **bias in performance metrics**, as neutral/no-change states are forced into either up or down categories.
+> As a result, reported accuracy and F1 scores may be **inflated beyond realistic levels**.
+> Future work will reformulate the task as a **3-class classification (up, down, neutral)** to reduce bias and provide more reliable evaluation.
+
 Designed a Forex price prediction model using a stacked LSTM architecture with attention mechanisms and Monte Carlo Dropout. The model forecasts prices for Forex and quantifies prediction confidence
 * **Model Architecture** : 3-layer Stacked LSTM (128→64→32) + Attention Mechanism
 * **Data Source**: Yahoo Finance API (historical prices)
@@ -38,7 +44,7 @@ Designed a Forex price prediction model using a stacked LSTM architecture with a
     * Monte Carlo Dropout for uncertainty estimation
     * Bayesian optimization for hyperparameter tuning
     * Predictive confidence interval visualization
-* **Performance Metrics**: MSE: 0.0182, Directional Accuracy: 89.4%, Confidence Interval: ±2.1%
+* ~~**Performance Metrics**: MSE: 0.0182, Directional Accuracy: 89.4%, Confidence Interval: ±2.1%~~
 
 
  ## 4. RNN - LSTM Sentiment Analysis
