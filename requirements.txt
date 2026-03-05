@@ -19,3 +19,4 @@ datasets
 streamlit
 plotly
 Pillow
+altair<5
